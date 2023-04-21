@@ -2,10 +2,14 @@ import "../css/style.css";
 import "../css/form.css";
 import Head from "next/head";
 import Link from "next/link";
+import { SessionProvider } from "next-auth/react";
 
-function MyApp({ Component, pageProps }) {
+export default function App({
+  Component,
+  pageProps: { session, ...pageProps },
+}) {
   return (
-    <>
+    <SessionProvider session={session}>
       <Head>
         <title>Pet Care App</title>
       </Head>
@@ -25,8 +29,6 @@ function MyApp({ Component, pageProps }) {
       <div className="grid wrapper">
         <Component {...pageProps} />
       </div>
-    </>
+    </SessionProvider>
   );
 }
-
-export default MyApp;
