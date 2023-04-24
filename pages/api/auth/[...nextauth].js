@@ -2,6 +2,9 @@
 import axios from "axios";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+
+const authUrl = "http://localhost:3001/api";
+
 export default NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
 
@@ -13,15 +16,16 @@ export default NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials, req) {
-        const usDb = await axios.post("http://localhost:3001/api/login", {
-          email: credentials.email,
-          password: credentials.password,
-        });
-        if ((await usDb) != null) {
-          const user = { name: await usDb.email };
-          return user;
-        } else {
-          return null;
+        try {
+          const response = await axios.post(`${authUrl}/login`, {
+            email: credentials.email,
+            password: credentials.password,
+          });
+          const user = response.data.user;
+          const token = response.data.token;
+          return { ...user, token };
+        } catch (error) {
+          throw new Error("Invalid login credentials");
         }
       },
     }),
